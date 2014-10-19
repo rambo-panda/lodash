@@ -1337,6 +1337,48 @@
     /*------------------------------------------------------------------------*/
 
     /**
+     * A specialized version of `_.max` for arrays without support for iteratees.
+     *
+     * @private
+     * @param {Array} array The array to iterate over.
+     * @returns {*} Returns the maximum value.
+     */
+    function arrayMax(array) {
+      var index = -1,
+          length = array.length,
+          result = NEGATIVE_INFINITY;
+
+      while (++index < length) {
+        var value = array[index];
+        if (value > result) {
+          result = value;
+        }
+      }
+      return result;
+    }
+
+    /**
+     * A specialized version of `_.min` for arrays without support for iteratees.
+     *
+     * @private
+     * @param {Array} array The array to iterate over.
+     * @returns {*} Returns the minimum value.
+     */
+    function arrayMin(array) {
+      var index = -1,
+          length = array.length,
+          result = POSITIVE_INFINITY;
+
+      while (++index < length) {
+        var value = array[index];
+        if (value < result) {
+          result = value;
+        }
+      }
+      return result;
+    }
+
+    /**
      * Used by `_.defaults` to customize its `_.assign` use.
      *
      * @private
@@ -5434,12 +5476,11 @@
      * // => { 'user': 'fred', 'age': 40 };
      */
     function max(collection, iteratee, thisArg) {
-      var noIteratee = iteratee == null;
-      if (!noIteratee && isIterateeCall(collection, iteratee, thisArg)) {
+      if (thisArg && isIterateeCall(collection, iteratee, thisArg)) {
         iteratee = null;
-        noIteratee = true;
       }
-      var isArr = noIteratee && isArray(collection),
+      var noIteratee = iteratee == null,
+          isArr = noIteratee && isArray(collection),
           isStr = !isArr && isString(collection);
 
       if (noIteratee && !isStr) {
@@ -5506,12 +5547,11 @@
      * // => { 'user': 'barney', 'age': 36 };
      */
     function min(collection, iteratee, thisArg) {
-      var noIteratee = iteratee == null;
-      if (!noIteratee && isIterateeCall(collection, iteratee, thisArg)) {
+      if (thisArg && isIterateeCall(collection, iteratee, thisArg)) {
         iteratee = null;
-        noIteratee = true;
       }
-      var isArr = noIteratee && isArray(collection),
+      var noIteratee = iteratee == null,
+          isArr = noIteratee && isArray(collection),
           isStr = !isArr && isString(collection);
 
       if (noIteratee && !isStr) {
@@ -5901,8 +5941,9 @@
      * // = > [['barney', 26], ['barney', 36], ['fred', 30], ['fred', 40]]
      */
     function sortBy(collection, iteratee, thisArg) {
-      iteratee = isIterateeCall(collection, iteratee, thisArg) ? null : iteratee;
-
+      if (thisArg && isIterateeCall(collection, iteratee, thisArg)) {
+        iteratee = null;
+      }
       var index = -1,
           length = collection ? collection.length : 0,
           multi = iteratee && isArray(iteratee),
@@ -8778,7 +8819,7 @@
       // https://github.com/olado/doT
       var settings = lodash.templateSettings;
 
-      if (isIterateeCall(string, options, otherOptions)) {
+      if (otherOptions && isIterateeCall(string, options, otherOptions)) {
         options = otherOptions = null;
       }
       string = String(string == null ? '' : string);
